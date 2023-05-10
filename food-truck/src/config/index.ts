@@ -1,10 +1,11 @@
 import { Level } from "pino"
 import env from "./env"
+import { DomainConfig } from "../domain"
 
 const pkg = require("../../package.json")
 
 /**
- * The application configuration object
+ * The server configuration object
  *
  * @interface
  * @typedef {Object<string, number|boolean|string>} ServerConfig
@@ -28,6 +29,8 @@ export interface ServerConfig {
   version: string
 }
 
+export interface AppConfig extends ServerConfig, DomainConfig {}
+
 export const config = {
   name: pkg.name,
   apiVersion: `v${pkg.version.split(".")[0]}`,
@@ -35,8 +38,9 @@ export const config = {
   shouldPrettyPrint: env.PRETTY_PRINT,
   host: env.HOST,
   port: env.PORT,
+  csvPath: env.CSV_PATH,
   level: env.LOG_LEVEL,
   isProduction: env.NODE_ENV === "production"
-} as ServerConfig
+} as AppConfig
 
 export default config

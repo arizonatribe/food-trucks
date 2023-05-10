@@ -12,10 +12,9 @@ const router = Router()
  * @returns {Router} An instance of the [Express Router](https://expressjs.com/en/api.html#router)
  */
 function createRoutes(middleware: Middleware) {
-  const { healthCheck } = middleware
+  const { healthCheck, readCsv } = middleware
 
-  return router
-    .get("/healthcheck", healthCheck)
+  return router.get("/healthcheck", healthCheck).get("/food-trucks", readCsv)
 }
 
 export default createRoutes

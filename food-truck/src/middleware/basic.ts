@@ -67,9 +67,20 @@ function createBasicMiddleware(config: ServerConfig, logger: Logger) {
    */
   function globalErrorHandler(err: ErrorWithExtensions, _request: Request, res: Response, _: NextFunction) {
     logger.error(err)
-    res.status(err.extensions && err.extensions.code).json({
+
+    const code = +(err.extensions?.code ?? 500)
+    const message = code < 500 ? err.message : "An error occurred. Please check the logs for details"
+
+    logger.error({
+      code,
+      errorReturned: message,
+      actualError: err.message,
+      additionalDetail: err.extensions
+    })
+
+    res.status(code).json({
+      message,
       success: false,
-      message: err.message,
       data: err.extensions
     })
   }
@@ -90,9 +101,7 @@ function createBasicMiddleware(config: ServerConfig, logger: Logger) {
       success: false,
       message: `The endpoint '${
         req.originalUrl
-      }' is not supported by this application (or isn't supported for ${
-        req.method.toUpperCase()
-      } requests like these)`
+      }' is not supported by this application (or isn't supported for ${req.method.toUpperCase()} requests like these)`
     })
   }
 

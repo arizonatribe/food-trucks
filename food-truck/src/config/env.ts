@@ -1,12 +1,11 @@
 import dotenv from "dotenv"
 import * as envalid from "envalid"
 import { Level } from "pino"
+import { DomainEnv, DomainEnvValidators } from "../domain"
 
 const { bool, str, port } = envalid
 
-const dotEnvPath = /^production$/.test(process.env.NODE_ENV as string)
-  ? ".env.prod"
-  : ".env"
+const dotEnvPath = /^production$/.test(process.env.NODE_ENV as string) ? ".env.prod" : ".env"
 
 const result = dotenv.config({ path: dotEnvPath })
 
@@ -15,7 +14,7 @@ if (result.error) {
 }
 
 /**
- * The minimum expected environment variables
+ * The minimum expected environment variables to launch the server
  *
  * @interface
  * @typedef {Object<string, number|boolean|string>} ServerEnv
@@ -33,7 +32,11 @@ export interface ServerEnv {
   PORT: number
 }
 
-export const env = envalid.cleanEnv<ServerEnv>(process.env, {
+export interface AppEnv extends ServerEnv, DomainEnv {}
+
+export const env = envalid.cleanEnv<AppEnv>(process.env, {
+  ...DomainEnvValidators,
+
   PRETTY_PRINT: bool({
     default: false,
     desc: "Whether or not to format the stdout/stderr logs in a visually styled manner (mainly for local development)."
