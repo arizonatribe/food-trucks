@@ -1,22 +1,55 @@
-/* eslint-disable no-console */
 import * as fs from "fs"
 import * as path from "path"
 import { makeValidator, EnvError } from "envalid"
 
 import { AnyObject } from "./types"
 
-export const filePath = makeValidator<string>((x: string) => {
-  if (fs.existsSync(x)) {
-    return x
+/**
+ * Tries to verify a given file/folder path exists
+ *
+ * @function
+ * @name tryPath
+ * @param {string} val A possible path to a file or folder
+ * @returns {string|undefined} Yields the validated file/folder path or otherwise undefined
+ */
+export function tryPath(val: string) {
+  if (typeof val !== "string" || /^\s*$/.test(val)) return undefined
+  if (fs.existsSync(val)) return val
+  if (fs.existsSync(path.resolve(process.cwd(), val))) return val
+  return undefined
+}
+
+/**
+ * Validates a given string value represents a valid path to a file
+ *
+ * @function
+ * @name filePath
+ * @throws {Error} When the file path is missing or does not exist
+ * @param {string} val A string value representing a file path
+ * @returns {string} The validated file path
+ */
+export const filePath = makeValidator<string>((val: string) => {
+  const validatedPath = tryPath(val)
+
+  if (validatedPath === undefined) {
+    throw new EnvError(`Invalid file/folder path: '${val}'`)
   }
 
-  if (fs.existsSync(path.resolve(process.cwd(), x))) {
-    return path.resolve(process.cwd(), x)
+  if (fs.statSync(validatedPath).isDirectory()) {
+    throw new EnvError("Must be a path to a file, not a directory")
   }
 
-  throw new EnvError(`File path does not exist: ${x}`)
+  return validatedPath
 })
 
+/**
+ * Converts a value to its numeric equivalent, and force converts non-numeric values to zero
+ *
+ * @function
+ * @name toNumber
+ * @param {*} val A value to convert to a number
+ * @returns {number} The converted value (zero if the source value was non-numeric)
+ */
 export function toNumber(val: any): number {
   const num = +val
   return Number.isFinite(num) && !Number.isNaN(num) ? num : 0
@@ -47,7 +80,7 @@ export function parseCsv<T extends AnyObject>(
   const numOfSubFields = nestedObjNames.length
   const numOfNumericFields = numericFields.length
 
-  const items = Array(rowLength)
+  const items = Array(rowLength) // array capacity known up-front
 
   for (let r = 0; r < rowLength; r++) {
     const obj = {} as AnyObject
