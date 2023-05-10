@@ -91,6 +91,10 @@ export interface FoodTruck extends AnyObject {
   permit: Permit
 }
 
+export interface FoodTruckCollection extends AnyObject {
+  [id: string]: FoodTruck
+}
+
 export const CSV_COLUMNS: Array<[string, string]> = [
   ["location", "id"],
   ["proprietor", "name"],

@@ -5,6 +5,22 @@ import { makeValidator, EnvError } from "envalid"
 import { AnyObject } from "./types"
 
 /**
+ * Deep clones any object whose top-level fields are themselves objects
+ *
+ * @function
+ * @name clone
+ * @param {AnyObject} obj Any object whose top-level fields are also objects
+ * @returns {AnyObject} A cloned object
+ */
+export function clone<T extends AnyObject>(obj: T): T {
+  const copiedObj = {} as AnyObject
+  Object.entries(obj).forEach(([key, val]) => {
+    copiedObj[key] = { ...val } as any
+  })
+  return copiedObj as T
+}
+
+/**
  * Tries to verify a given file/folder path exists
  *
  * @function
