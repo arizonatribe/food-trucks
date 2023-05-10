@@ -2,7 +2,7 @@
   "name": "food-truck",
   "author": "David Nunez <arizonatribe@gmail.com>",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "TODO",
   "license": "UNLICENSED",
   "main": "lib/server.js",
