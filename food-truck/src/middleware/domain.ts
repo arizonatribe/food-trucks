@@ -190,6 +190,7 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
       next(err)
     }
   }
+
   /**
    * Searches for Food Truck proprietors by their food items
    *
@@ -203,6 +204,39 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
     try {
       const search = req.query?.q ?? req.query?.search ?? ""
       const data = await client.searchByItem(search as string)
+
+      logger.debug(data)
+
+      if (data.length === 0) {
+        res.status(204).json({
+          success: true,
+          status: "NO CONTENT"
+        })
+      } else {
+        res.status(200).json({
+          success: true,
+          status: "OK",
+          data
+        })
+      }
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  /**
+   * Searches for Food Truck proprietors by name
+   *
+   * @function
+   * @name searchByName
+   * @param {Request} req The connect middleware HTTP request object
+   * @param {Response} res The connect middleware HTTP response object whose methods are used to resolve the middleware chain and send a true HTTP response back to the caller
+   * @param {NextFunction} next The `next` middleware function which pushes execution forward
+   */
+  async function searchByName(req: Request, res: Response, next: NextFunction) {
+    try {
+      const search = req.query?.q ?? req.query?.search ?? ""
+      const data = await client.searchByName(search as string)
 
       logger.debug(data)
 
@@ -296,6 +330,7 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
     searchByStatus,
     searchByType,
     searchByItem,
+    searchByName,
     searchByBlock,
     fetchAll,
     getById

@@ -3,8 +3,9 @@ import { DomainConfig } from "../domain"
 import { AppConfig, ServerConfig } from "../config"
 import createBasicMiddleware, { BasicMiddleware } from "./basic"
 import createDomainMiddleware, { DomainMiddleware } from "./domain"
+import createDocsMiddleware, { DocsMiddleware } from "./docs"
 
-export interface Middleware extends BasicMiddleware, DomainMiddleware {}
+export interface Middleware extends BasicMiddleware, DomainMiddleware, DocsMiddleware { }
 
 /**
  * A factory function which creates all the app and common middleware
@@ -18,8 +19,9 @@ export interface Middleware extends BasicMiddleware, DomainMiddleware {}
 function createMiddleware(config: AppConfig, logger: Logger) {
   const basic = createBasicMiddleware(config as ServerConfig, logger)
   const domain = createDomainMiddleware(config as DomainConfig, logger)
+  const docs = createDocsMiddleware(config.openApi, logger)
 
-  return { ...basic, ...domain } as Middleware
+  return { ...basic, ...domain, ...docs } as Middleware
 }
 
 export default createMiddleware

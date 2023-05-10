@@ -4,20 +4,6 @@ import { DomainConfig } from "../domain"
 
 const pkg = require("../../package.json")
 
-/**
- * The server configuration object
- *
- * @interface
- * @typedef {Object<string, number|boolean|string>} ServerConfig
- * @property {string} apiVersion The API version prefix used externally to hit any of the application's endpoints
- * @property {string} host The host/hostname for the application (without the transport protocol prefix)
- * @property {boolean} isProduction Whether or not this application is running in production
- * @property {Level} level The logging threshold level
- * @property {string} name The name of the application
- * @property {number} port The TCP port number on which the server runs
- * @property {boolean} shouldPrettyPrint Whether or not to format the stdout/stderr logs in a visually styled manner (mainly for local development).
- * @property {string} version The semantic version of the application
- */
 export interface ServerConfig {
   apiVersion: string
   name: string
@@ -29,18 +15,64 @@ export interface ServerConfig {
   version: string
 }
 
-export interface AppConfig extends ServerConfig, DomainConfig {}
+export interface OpenApiConfig {
+  definition: {
+    openapi: string
+    info: {
+      title: string
+      version: string
+      description: string
+      license: {
+        name: string
+        url?: string
+      }
+      contact: {
+        name: string
+        url?: string
+        email: string
+      }
+    }
+    servers: { url: string }[]
+  }
+  apis: string[]
+}
+
+export interface AppConfig extends ServerConfig, DomainConfig {
+  openApi: OpenApiConfig
+}
+
+const apiVersion = `v${pkg.version.split(".")[0]}`
+
+const openApi = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: pkg.description,
+      version: pkg.version,
+      license: {
+        name: pkg.license
+      },
+      contact: {
+        name: pkg.author.split(/</)[0],
+        email: pkg.author.match(/[^<]+<([^>]+)>/)[1]
+      }
+    },
+    servers: [{ url: `http://${env.HOST}:${env.PORT}/${apiVersion}` }]
+  },
+  apis: ["./lib/routes.js", "./src/routes.ts"]
+} as OpenApiConfig
 
 export const config = {
   name: pkg.name,
-  apiVersion: `v${pkg.version.split(".")[0]}`,
+  apiVersion,
   version: pkg.version,
   shouldPrettyPrint: env.PRETTY_PRINT,
   host: env.HOST,
   port: env.PORT,
   csvPath: env.CSV_PATH,
   level: env.LOG_LEVEL,
-  isProduction: env.NODE_ENV === "production"
+  isProduction: env.NODE_ENV === "production",
+  openApi
 } as AppConfig
 
 export default config
