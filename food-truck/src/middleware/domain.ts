@@ -1,7 +1,8 @@
 import { Logger } from "pino"
 import { Request, Response, NextFunction } from "express"
 
-import { createDomainDataClient, DomainConfig, PermitStatus } from "../domain"
+import { toNumber } from "../util"
+import { createDomainDataClient, DomainConfig, PermitStatus, ProprietorType } from "../domain"
 
 /**
  * A factory function which creates middleware which handles the data domain.
@@ -67,6 +68,31 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
   }
 
   /**
+   * Reports on the blocks where Food Truck proprietors are permitted
+   *
+   * @function
+   * @name reportByBlock
+   * @param {Request} _req The connect middleware HTTP request object
+   * @param {Response} res The connect middleware HTTP response object whose methods are used to resolve the middleware chain and send a true HTTP response back to the caller
+   * @param {NextFunction} next The `next` middleware function which pushes execution forward
+   */
+  async function reportByBlock(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await client.reportByBlock()
+
+      logger.debug(data)
+
+      res.status(200).json({
+        success: true,
+        status: "OK",
+        data
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  /**
    * Searches for Food Truck proprietors by type
    *
    * @function
@@ -78,7 +104,7 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
   async function searchByType(req: Request, res: Response, next: NextFunction) {
     try {
       const search = req.query?.q ?? req.query?.search ?? ""
-      const data = await client.searchByType(search as string)
+      const data = await client.searchByType(search as ProprietorType)
 
       logger.debug(data)
 
@@ -132,6 +158,38 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
     }
   }
 
+  /**
+   * Searches for Food Truck proprietors by block
+   *
+   * @function
+   * @name searchByBlock
+   * @param {Request} req The connect middleware HTTP request object
+   * @param {Response} res The connect middleware HTTP response object whose methods are used to resolve the middleware chain and send a true HTTP response back to the caller
+   * @param {NextFunction} next The `next` middleware function which pushes execution forward
+   */
+  async function searchByBlock(req: Request, res: Response, next: NextFunction) {
+    try {
+      const search = toNumber(req.query?.q ?? req.query?.search)
+      const data = await client.searchByBlock(search)
+
+      logger.debug(data)
+
+      if (data.length === 0) {
+        res.status(204).json({
+          success: true,
+          status: "NO CONTENT"
+        })
+      } else {
+        res.status(200).json({
+          success: true,
+          status: "OK",
+          data
+        })
+      }
+    } catch (err) {
+      next(err)
+    }
+  }
   /**
    * Searches for Food Truck proprietors by their food items
    *
@@ -232,11 +290,13 @@ function createDomainMiddleware(config: DomainConfig, logger: Logger) {
   }
 
   return {
+    reportByBlock,
     reportByStatus,
     reportByType,
     searchByStatus,
     searchByType,
     searchByItem,
+    searchByBlock,
     fetchAll,
     getById
   }

@@ -1,4 +1,12 @@
-import { CSV_COLUMNS, NUMERIC_FIELDS, LIST_FIELDS, PermitStatus, FoodTruck, FoodTruckCollection } from "./types"
+import {
+  CSV_COLUMNS,
+  NUMERIC_FIELDS,
+  LIST_FIELDS,
+  PermitStatus,
+  ProprietorType,
+  FoodTruck,
+  FoodTruckCollection
+} from "./types"
 import { parseCsv, clone } from "../util"
 
 /**
@@ -90,7 +98,11 @@ export function createDomainDataClient(csvPath: string) {
       return _searchBy(status, ["permit", "status"])
     },
 
-    async searchByType(type: string) {
+    async searchByBlock(block: number) {
+      return _searchBy(block as any, ["neighborhood", "block"])
+    },
+
+    async searchByType(type: ProprietorType) {
       return _searchBy(type, ["proprietor", "type"])
     },
 
@@ -104,6 +116,10 @@ export function createDomainDataClient(csvPath: string) {
 
     async reportByStatus() {
       return _reportBy(["permit", "status"])
+    },
+
+    async reportByBlock() {
+      return _reportBy(["neighborhood", "block"])
     }
   }
 

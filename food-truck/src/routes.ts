@@ -17,8 +17,10 @@ function createRoutes(middleware: Middleware) {
     fetchAll,
     getById,
     reportByType,
+    reportByBlock,
     reportByStatus,
     searchByType,
+    searchByBlock,
     searchByStatus,
     searchByItem
   } = middleware
@@ -29,8 +31,10 @@ function createRoutes(middleware: Middleware) {
     .get("/food-trucks/:id", getById)
     .get("/report/type", reportByType)
     .get("/report/status", reportByStatus)
+    .get("/report/block", reportByBlock)
     .get("/search/type", searchByType)
     .get("/search/status", searchByStatus)
+    .get("/search/block", searchByBlock)
     .get("/search/food", searchByItem)
 }
 

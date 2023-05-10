@@ -37,10 +37,12 @@ export interface DomainConfig {
   csvPath: string
 }
 
+export type ProprietorType = "Truck" | "Push Cart"
+
 export interface Proprietor extends AnyObject {
   id: number
   name: string
-  type: string // Truck |
+  type: ProprietorType
   items: string[]
 }
 
