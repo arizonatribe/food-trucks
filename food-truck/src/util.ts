@@ -79,22 +79,26 @@ export function toNumber(val: any): number {
  * @param {string} csvPath A relative or absolute path to a csv file
  * @param {Array<[string, string]>} columnDefinition A mapping which matches a CSV column to a nested field in the return type
  * @param {Array<[string, string]>} numericFields A mapping which identifies any fields which should be converted from string to numeric
+ * @param {Array<[string, string]>} listFields A mapping which identifies any fields which should be converted from string to lists
  * @returns {Array<Object<string, any>>} The parsed csv content
  */
 export function parseCsv<T extends AnyObject>(
   csvPath: string,
   columnDefinition: [string, string][],
-  numericFields: [string, string][]
+  numericFields: [string, string][],
+  listFields: [string, string][]
 ): T[] {
+  const nestedObjNames = Array.from(new Set(columnDefinition.map((cd) => cd[0])))
+
   const content = fs.readFileSync(csvPath, "utf8")
   const csv = content.toString()
   const rows = csv.split(/\n/).slice(1)
-  const colLength = columnDefinition.length
-  const rowLength = rows.length
 
-  const nestedObjNames = Array.from(new Set(columnDefinition.map((cd) => cd[0])))
+  const rowLength = rows.length
+  const colLength = columnDefinition.length
   const numOfSubFields = nestedObjNames.length
   const numOfNumericFields = numericFields.length
+  const numOfListFields = listFields.length
 
   const items = Array(rowLength) // array capacity known up-front
 
@@ -124,6 +128,18 @@ export function parseCsv<T extends AnyObject>(
       const subObjFieldName = numericFields[n][1]
 
       obj[subObjName][subObjFieldName] = toNumber(obj[subObjName][subObjFieldName])
+    }
+
+    // Convert default string values to arrays
+    for (let l = 0; l < numOfListFields; l++) {
+      const subObjName = listFields[l][0]
+      const subObjFieldName = listFields[l][1]
+
+      // The colon is used as a delimiter, but sometimes parenthesis wrap as well
+      obj[subObjName][subObjFieldName] = obj[subObjName][subObjFieldName]
+        ?.split(/[:()]/)
+        .map((s: string) => s.trim())
+        .filter(Boolean)
     }
 
     // Add the row to the list

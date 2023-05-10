@@ -41,7 +41,7 @@ export interface Proprietor extends AnyObject {
   id: number
   name: string
   type: string // Truck |
-  items: string
+  items: string[]
 }
 
 export interface Schedule extends AnyObject {
@@ -146,3 +146,5 @@ export const NUMERIC_FIELDS: Array<[string, string]> = [
   ["permit", "prior"],
   ["permit", "receivedAt"]
 ]
+
+export const LIST_FIELDS: Array<[string, string]> = [["proprietor", "items"]]

@@ -1,6 +1,5 @@
-import { CSV_COLUMNS, NUMERIC_FIELDS, FoodTruck, FoodTruckCollection } from "./types"
+import { CSV_COLUMNS, NUMERIC_FIELDS, LIST_FIELDS, PermitStatus, FoodTruck, FoodTruckCollection } from "./types"
 import { parseCsv, clone } from "../util"
-import { PermitStatus } from "."
 
 /**
  * Coerces the contents of a structured CSV file to the domain data
@@ -11,7 +10,7 @@ import { PermitStatus } from "."
  * @returns {FoodTruckCollection} A hash-map of data domain objects
  */
 export function toDomainData(csvPath: string): FoodTruckCollection {
-  const items = parseCsv<FoodTruck>(csvPath, CSV_COLUMNS, NUMERIC_FIELDS)
+  const items = parseCsv<FoodTruck>(csvPath, CSV_COLUMNS, NUMERIC_FIELDS, LIST_FIELDS)
   const dataGraph = {} as FoodTruckCollection
   for (let i = 0, len = items.length; i < len; i++) {
     dataGraph[items[i].proprietor.id] = items[i]
@@ -66,7 +65,11 @@ export function createDomainDataClient(csvPath: string) {
    */
   function _searchBy(q: string, fieldPath: [string, string]) {
     const pattern = new RegExp(`${q}`, "i")
-    return Object.values(data).filter((d) => pattern.test(d[fieldPath[0]][fieldPath[1]]))
+    return Object.values(data).filter((d) => (
+      Array.isArray(d)
+        ? d.some((dt) => pattern.test(dt[fieldPath[0]][fieldPath[1]]))
+        : pattern.test(d[fieldPath[0]][fieldPath[1]])
+    ))
   }
 
   const client = {
