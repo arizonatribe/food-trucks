@@ -1,0 +1,34 @@
+.SearchWrapper {
+  display: grid;
+  padding: 1em 0;
+  justify-content: stretch;
+}
+
+.SearchWithButton {
+    display: grid;
+    grid-template-areas: "search-type-button search-box search-button";
+    grid-template-columns: auto 1fr auto;
+    border: 1px solid transparent;
+    border-left: 1px solid whitesmoke;
+    border-top: 1px solid whitesmoke;
+    border-radius: 0.1em;
+    box-shadow: 1px 1px 1px whitesmoke inset, 2px 2px 2px lightgray;
+    min-width: 50vw;
+}
+
+.SearchTextbox {
+  display: block;
+  grid-area: search-box;
+  padding: 0.6em;
+  border: 0;
+  border-right: 1px solid lightgray;
+  border-left: 1px solid lightgray;
+  outline: none;
+  color: gray;
+  caret-color: lightgray;
+  font-size: 0.8em;
+}
+
+.SearchTextbox:focus {
+  outline: none;
+}

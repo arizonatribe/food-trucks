@@ -1,36 +1,36 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import React, { useState } from "react"
 
-import logo from './logo.svg';
-import './App.css';
-import Map from './Map';
-import Report from './Report';
-
-const queryClient = new QueryClient();
+import "./App.css"
+import Map from "./Map"
+import Report from "./Report"
+import SearchBox from "./SearchBox"
+import TruckMarker from "./TruckMarker"
+import { SearchType, toggleSearchType, useSearch } from "./api"
 
 function App() {
+  const [searchText, setSearchText] = useState<string>("")
+  const [searchType, setSearchType] = useState<SearchType>("name")
+  const { data: trucks = [] } = useSearch(searchType, searchText);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <Report />
-        </header>
-        <Map />
-      </div>
-    </QueryClientProvider>
-  );
+    <div className="App">
+      <header className="App-header">
+        <SearchBox
+          text={searchText}
+          searchType={searchType}
+          toggleSearchType={() => setSearchType(toggleSearchType(searchType))}
+          handleSearch={setSearchText}
+        />
+        <p>Search by the name, type, permit status or items served by food trucks</p>
+        <Report />
+      </header>
+      <Map>
+        {trucks.map((t) => (
+          <TruckMarker key={t.proprietor?.id} schedule={t.schedule} truck={t.proprietor} loc={t.location} />
+        ))}
+      </Map>
+    </div>
+  )
 }
 
-export default App;
+export default App

@@ -1,0 +1,16 @@
+.SearchTypeButton {
+    grid-area: search-type-button;
+    font-size: 1em;
+    padding: 0.2em;
+    cursor: pointer;
+    display: grid;
+    outline: none;
+    align-content: center;
+    justify-items: center;
+    background-color: inherit;
+    border-radius: 0.1.em;
+    color: whitesmoke;
+    transition: background-color 0.2s ease;
+    width: 4em;
+    height: 2.5em;
+}

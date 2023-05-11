@@ -37,3 +37,35 @@ export function useSearchTrucksByFoodQuery(f: string) {
 export function useSearchTrucksByNameQuery(n: string) {
   return useQuery('searchTrucksByName', () => client.searchTrucksByName(n));
 }
+
+export type SearchType = 'status' | 'type' | 'name' | 'food';
+
+export function toggleSearchType(currentSearchType: SearchType): SearchType {
+  switch (currentSearchType) {
+    case 'status':
+      return 'type';
+    case 'type':
+      return 'name';
+    case 'name':
+      return 'food';
+    default:
+      return 'status';
+  }
+}
+
+export function useSearch(searchType: SearchType, search: string) {
+  return useQuery(
+    `${searchType}_${search}}`,
+    search === ''
+      ? client.getTrucks
+      : searchType === 'food'
+        ? () => client.searchTrucksByFood(search)
+        : searchType === 'name'
+          ? () => client.searchTrucksByName(search)
+          : searchType === 'type'
+            ? () => client.searchTrucksByType(search as any)
+            : searchType === 'status'
+              ? () => client.searchTrucksByStatus(search as any)
+              : client.getTrucks
+  );
+}
