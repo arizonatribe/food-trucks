@@ -14,14 +14,14 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="Header">
         <SearchBox
           text={searchText}
           searchType={searchType}
           toggleSearchType={() => setSearchType(toggleSearchType(searchType))}
           handleSearch={setSearchText}
         />
-        <p>Search by the name, type, permit status or items served by food trucks</p>
+        <p>Toggle the search by name, type, permit status or items served by food trucks</p>
         <Report />
       </header>
       <Map>

@@ -2,13 +2,18 @@
   text-align: center;
 }
 
-.App-header {
+.Header {
   background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 1vmin);
   color: white;
+}
+
+.Header p {
+  display: block;
+  padding: 0;
+  margin: 0 auto 1em auto;
 }
